@@ -41,8 +41,9 @@ def icu_detail(request, pk):
     if request.method == 'GET':
         serializer = ICUSerializers(icu, many=False)
         return Response(serializer.data)
+
     elif request.method == "PUT":
-        serializer = ICUSerializers(ICUModels, data=request.data)
+        serializer = ICUSerializers(icu, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -60,7 +61,7 @@ def isolation_room_list(request):
     return Response(serializer.data)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'PUT', 'DELETE'])
 def isolation_room_detail(request, pk):
     room = get_object_or_404(IsolationRoom, pk=pk)
     serializer = RoomSerializers(room, many=False)

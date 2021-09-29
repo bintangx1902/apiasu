@@ -1,4 +1,5 @@
 from django.urls import path
+from rest_framework.urlpatterns import format_suffix_patterns
 from .views import *
 
 app_name = 'api'
@@ -10,3 +11,5 @@ urlpatterns = [
     path('room', isolation_room_list, name='room'),
     path('s-room', special_room_list, name='s-room'),
 ]
+
+urlpatterns = format_suffix_patterns(urlpatterns)
