@@ -9,10 +9,13 @@ from rest_framework import status
 def preview(request):
     api = {
         'ICU API': ['/api/icu', '/api/icu/<pk>'],
-        'Isolation Room API': '/api/room/',
-        'Special Room API': '/api/s-room/',
+        'Isolation Room API': ['/api/room/', '/api/room/<pk>'],
+        'Special Room API': ['/api/s-room/', '/api/s-room/<pk>'],
     }
     return Response(api)
+
+
+""" API ICU """
 
 
 @api_view(['GET', 'POST'])
@@ -54,6 +57,9 @@ def icu_detail(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+""" API Room """
+
+
 @api_view(['GET', 'POST'])
 def isolation_room_list(request):
     if request.method == "GET":
@@ -92,15 +98,40 @@ def isolation_room_detail(request, pk):
         return Response(status.HTTP_204_NO_CONTENT)
 
 
-@api_view(['GET'])
+""" API Special Room """
+
+
+@api_view(['GET', 'POST'])
 def special_room_list(request):
-    s_room = SpecialRoom.objects.all()
-    serializer = SpecialRoomSerializers(s_room, many=True)
-    return Response(serializer.data)
+    if request.method == "GET":
+        s_room = SpecialRoom.objects.all()
+        serializer = SpecialRoomSerializers(s_room, many=True)
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        serializer = SpecialRoomSerializers(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'PUT', 'DELETE'])
 def special_room_detail(request, pk):
-    s_room = get_object_or_404(SpecialRoom, pk=pk)
-    serializer = SpecialRoomSerializers(s_room, many=False)
-    return Response(serializer.data)
+    try:
+        s_room = get_object_or_404(SpecialRoom, pk=pk)
+    except SpecialRoom.DoesNotExist:
+        return Response(status.HTTP_404_NOT_FOUND)
+
+    if request.method == "GET":
+        serializer = SpecialRoomSerializers(s_room, many=False)
+        return Response(serializer.data)
+
+    elif request.method == "PUT":
+        serializer = SpecialRoomSerializers(SpecialRoom, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    elif request.method == "DELETE":
+        s_room.delete()
+        return Response(status.HTTP_204_NO_CONTENT)

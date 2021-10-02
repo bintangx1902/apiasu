@@ -11,6 +11,7 @@ urlpatterns = [
     path('room', isolation_room_list, name='room'),
     path('room/<int:pk>', isolation_room_detail, name='room-detail'),
     path('s-room', special_room_list, name='s-room'),
+    path('s-room/<int:pk>', special_room_detail, name='s-room-detail'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
